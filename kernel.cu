@@ -54,8 +54,8 @@ int main(void)
 {
 
 	//number of items on each axiss
-	int W = 5'000;
-	int H = 5'000;
+	int W = 8'00;
+	int H = 8'00;
 	int N = H * W;
 
 	double xmin = -2.0;
@@ -63,7 +63,7 @@ int main(void)
 	double ymin = -1.25;
 	double ymax = 1.25;
 
-	int iter = 100;
+	int iter = 255;
 
 	std::cout << W << " " << H << std::endl;
 	int* z, * d_z;
