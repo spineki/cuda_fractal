@@ -1,0 +1,8 @@
+*.dll
+x64/
+.vs/
+*.png
+*.sln
+*.vcxproj
+*.user
+*.pnm
