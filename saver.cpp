@@ -1,5 +1,6 @@
 #include <iostream>
 #include <windows.h>
+#include <string>
 #include <SFML/Graphics.hpp>
 #include <SFML/WINDOW/Mouse.hpp>
 
@@ -7,66 +8,27 @@
 #include "kernel.h"
 
 
-void save(int array[], int W, int H) {
-
-	std::cout<< "avant la creation de l'image\n";
-	sf::Image image;
-	image.create(W, H, sf::Color::Black);
-
-	for (int i = 0; i < H; i++) {
-		for (int j = 0; j < W; j++) {
-			sf::Color color = image.getPixel(i, j);
-			color.r = array[i * W + j];
-			color.b = array[i * W + j];
-			color.g = array[i * W + j];
-			image.setPixel(i, j, color);
-		}
-	}
-
-	sf::RenderWindow window(sf::VideoMode(W, H), "Fractale");
-	window.setVerticalSyncEnabled(true);
-
-	sf::Texture texture;
-	texture.create(W, H);
-	texture.update(image);
-
-	sf::Sprite sprite;
-	sprite.setTexture(texture);
-	sprite.setOrigin(W / 2.f, H / 2.f);
-	sprite.setPosition(sf::Vector2f(W / 2.f, H / 2.f));
-	sprite.setRotation(-90.f);
-
-	while (window.isOpen())
-	{
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-			{
-				std::cout << "click" << std::endl;
-				auto pos = sf::Mouse::getPosition(window);
-				std::cout << pos.x <<" "<< pos.y<< std::endl;
-			}
-
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
-
-		window.clear();
-		window.draw(sprite);
-		window.display();
-	}
-	/*
-	std::cout << "avant l'enregistrement de l'image" << std::endl;
-	if (!image.saveToFile("E:/Programmation/CUDA/test_somme/result.png")) {
-		std::cout << "Impossible d'enregistrer!!" << std::endl;
-	}*/
-
-}
-
-
+/*
+std::cout << "avant l'enregistrement de l'image" << std::endl;
+if (!image.saveToFile("E:/Programmation/CUDA/test_somme/result.png")) {
+	std::cout << "Impossible d'enregistrer!!" << std::endl;
+}*/
 
 int main() {
+
+	// Welcoming message
+
+	std::cout << " Welcome to the cuda-fractal explorer!\n" << "Here are some controls:\n"
+		<< "left arrow: go to left\n"
+		<< "right arrow: got to right\n"
+		<< "up arrow: go to the top\n"
+		<< "down arrow: go to the bottom\n"
+		<< "enter: zoom in\n"
+		<< "space: zoom out\n"
+		<< "\n You can also use your mouse. Left click were you want to zoom in, Right Click where you want to zoom out"
+		<< "\n In order to save the current picture, press the 'p' key (like print, yep). the file will be saved in the executable folder with the current coordinate"
+		<< "\n Have fun!!\n ************" << std::endl;
+
 
 	// limits of the picture
 	const int W = 8'00;
@@ -125,14 +87,12 @@ int main() {
 				double transx = ncx - cx;
 				double transy = cy-ncy;
 
-				std::cout << transx << " " << transy<< std::endl;
 				xmin += transx;
 				xmax += transx;
 				ymin += transy;
 				ymax += transy;
 
 				if (event.mouseButton.button == sf::Mouse::Right) {
-					std::cout << "click droit\n";
 					xmin -= width / 10.f;
 					xmax += width / 10.f;
 					ymin -= height / 10.f;
@@ -140,7 +100,6 @@ int main() {
 				}
 
 				else if (event.mouseButton.button == sf::Mouse::Left) {
-					std::cout << "click gauche\n";
 					xmin += width / 10.f;
 					xmax -= width / 10.f;
 					ymin += height / 10.f;
@@ -191,6 +150,25 @@ int main() {
 					ymax -= height / 10.f;
 				}
 
+				else if (event.key.code == sf::Keyboard::Space)
+				{
+					xmin -= width / 10.f;
+					xmax += width / 10.f;
+					ymin -= height / 10.f;
+					ymax += height / 10.f;
+				}
+
+				else if (event.key.code == sf::Keyboard::P) {
+					std::string name = std::to_string(xmin) + "_" + std::to_string(xmax) + "_" + std::to_string(ymin) + "_" + std::to_string(ymax)+".png";
+					std::cout << "Saving...";
+					if (!image.saveToFile(name.c_str())) {
+						std::cout << "Error" << std::endl;
+					}
+					else {
+						std::cout << "done!" << std::endl;
+					}
+				}
+
 			}
 
 
@@ -205,9 +183,9 @@ int main() {
 				for (int i = 0; i < H; i++) {
 					for (int j = 0; j < W; j++) {
 						sf::Color color = image.getPixel(i, j);
-						color.r = z[i * W + j];
-						color.b = z[i * W + j];
-						color.g = z[i * W + j];
+						color.r = z[i * W + j] * 1;
+						color.b = z[i * W + j] * 2;
+						color.g = z[i * W + j] * 3;
 						image.setPixel(i, j, color);
 					}
 				}
@@ -221,7 +199,6 @@ int main() {
 				//window.clear();
 				window.draw(sprite);
 				window.display();
-				std::cout << "update" << std::endl;
 				update = false;
 			}
 
