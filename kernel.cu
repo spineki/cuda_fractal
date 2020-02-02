@@ -38,7 +38,7 @@ void mandelbrot(int N, int* z, int W, int H, double xmin, double xmax, double ym
 			z_re = z_re2 - z_im2 + c_re;
 
 			if (z_re2 + z_im2 > 4.0) {
-				z[k] = it;
+				z[k] = it *255 / iter;
 				verif = false;
 				break;
 			}
