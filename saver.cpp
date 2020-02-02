@@ -78,8 +78,61 @@ int main() {
 	int* z;
 	z = (int*)malloc(N * sizeof(int));
 
+	// graphic part
+
+	sf::RenderWindow window(sf::VideoMode(W, H), "Cuda_fractale");
+	window.setVerticalSyncEnabled(true);
+
+	sf::Image image;
+	image.create(W, H, sf::Color::Black);
+
+	// generating a new frame
 	newFrame(z, W, H, xmin, xmax, ymin, ymax, iter);
-	save(z, W, H);
+
+	for (int i = 0; i < H; i++) {
+		for (int j = 0; j < W; j++) {
+			sf::Color color = image.getPixel(i, j);
+			color.r = z[i * W + j];
+			color.b = z[i * W + j];
+			color.g = z[i * W + j];
+			image.setPixel(i, j, color);
+		}
+	}
+
+	sf::Texture texture;
+	texture.create(W, H);
+	texture.update(image);
+
+	sf::Sprite sprite;
+	sprite.setTexture(texture);
+	sprite.setOrigin(W / 2.f, H / 2.f);
+	sprite.setPosition(sf::Vector2f(W / 2.f, H / 2.f));
+	sprite.setRotation(-90.f);
+
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				std::cout << "click" << std::endl;
+				auto pos = sf::Mouse::getPosition(window);
+				std::cout << pos.x << " " << pos.y << std::endl;
+			}
+
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		window.clear();
+		window.draw(sprite);
+		window.display();
+	}
+
+
+
+	// save(z, W, H);
 	free(z);
 
 
