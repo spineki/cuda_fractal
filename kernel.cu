@@ -3,14 +3,14 @@
 // Ici, f8 build, f9 run, f10 profile
 
 
-#include "saver.h"
+#include "kernel.h"
 #include <iostream>
 #include <math.h>
 #include <fstream>
 
 
 __global__
-void mandelbrot(int N, int* z, int W, int H, double xmin, double xmax, double ymin, double ymax, int iter = 100) {
+void mandelbrot(int N, int* z, int W, int H, double xmin, double xmax, double ymin, double ymax, int iter) {
 
 	double c_re, c_im;
 	double z_re = 0.0;
@@ -19,8 +19,8 @@ void mandelbrot(int N, int* z, int W, int H, double xmin, double xmax, double ym
 
 	int i, j;
 
-	int index = blockIdx.x * blockDim.x + threadIdx.x;
-	int stride = blockDim.x * gridDim.x;
+	const int index = blockIdx.x * blockDim.x + threadIdx.x;
+	const int stride = blockDim.x * gridDim.x;
 
 	int k;
 	for (k = index; k < N; k += stride) {
@@ -50,7 +50,26 @@ void mandelbrot(int N, int* z, int W, int H, double xmin, double xmax, double ym
 }
 
 
-int main(void)
+
+void newFrame(int* z, int W, int H, double xmin, double xmax, double ymin, double ymax , int iter =255) {
+	const unsigned int N = H * W;
+
+	// alloc
+	int* d_z; // limit à faire en passage par référence
+	cudaMalloc(&d_z, N * sizeof(int));
+	cudaMemcpy(d_z, z, N * sizeof(double), cudaMemcpyHostToDevice);
+
+	int blockSize = 256;
+	int numBlocks = (N + blockSize - 1) / blockSize;
+	mandelbrot <<<numBlocks, blockSize >>> (N, d_z, W, H, xmin, xmax, ymin, ymax, iter);
+	cudaMemcpy(z, d_z, N * sizeof(int), cudaMemcpyDeviceToHost);
+
+	//free (attention le z n'a pas été free)
+	cudaFree(d_z);
+}
+
+/*
+int main2(void)
 {
 
 	//number of items on each axiss
@@ -86,9 +105,9 @@ int main(void)
 
 
 
-	save(z, W, H);
+	//save(z, W, H);
 
-	/*
+	
 	std::ofstream file;
 	std::cout << "Début de l'écriture" << std::endl;
 	file.open("fractal_parallel.pnm");
@@ -106,9 +125,12 @@ int main(void)
 	file.close();
 
 	std::cout << "Fin de l'écriture" << "\n";
+	
 	cudaFree(d_z);
 	free(z);
 	std::cout << "Fin des free" << "\n";
-	*/
+	
 	return 0;
 }
+
+*/

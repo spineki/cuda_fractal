@@ -1,7 +1,8 @@
-#include "saver.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/WINDOW/Mouse.hpp>
+
+#include "kernel.h"
 
 
 void save(int array[], int W, int H) {
@@ -45,7 +46,6 @@ void save(int array[], int W, int H) {
 				std::cout << pos.x <<" "<< pos.y<< std::endl;
 			}
 
-
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
@@ -60,4 +60,28 @@ void save(int array[], int W, int H) {
 		std::cout << "Impossible d'enregistrer!!" << std::endl;
 	}*/
 
+}
+
+
+
+int main() {
+	const int W = 8'00;
+	const int H = 8'00;
+	const int N = H * W;
+
+	double xmin = -2.0;
+	double xmax = 0.5;
+	double ymin = -1.25;
+	double ymax = 1.25;
+
+	int iter = 255;
+	int* z;
+	z = (int*)malloc(N * sizeof(int));
+
+	newFrame(z, W, H, xmin, xmax, ymin, ymax, iter);
+	save(z, W, H);
+	free(z);
+
+
+	return 0;
 }
